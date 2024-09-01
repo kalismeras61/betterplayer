@@ -273,6 +273,37 @@ class _BetterPlayerCupertinoControlsState
     );
   }
 
+  GestureDetector _buildBackButton(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double iconSize,
+    double buttonPadding,
+  ) {
+    return GestureDetector(
+      onTap: _controlsConfiguration.onBackButton,
+      child: AnimatedOpacity(
+        opacity: controlsNotVisible ? 0.0 : 1.0,
+        duration: _controlsConfiguration.controlsHideTime,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            height: barHeight,
+            padding: EdgeInsets.symmetric(
+              horizontal: buttonPadding,
+            ),
+            decoration: BoxDecoration(color: backgroundColor),
+            child: Icon(
+              _controlsConfiguration.backButton,
+              color: iconColor,
+              size: iconSize,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Expanded _buildHitArea() {
     return Expanded(
       child: GestureDetector(
@@ -480,7 +511,7 @@ class _BetterPlayerCupertinoControlsState
       return const SizedBox();
     }
     final barHeight = topBarHeight * 0.8;
-    final iconSize = topBarHeight * 0.4;
+    final iconSize = topBarHeight * 0.5;
     return Container(
       height: barHeight,
       margin: EdgeInsets.only(
@@ -490,6 +521,16 @@ class _BetterPlayerCupertinoControlsState
       ),
       child: Row(
         children: <Widget>[
+          if (_controlsConfiguration.enableBackButton!)
+            _buildBackButton(
+              backgroundColor,
+              iconColor,
+              barHeight,
+              iconSize,
+              buttonPadding,
+            )
+          else
+            const SizedBox(),
           if (_controlsConfiguration.enableFullscreen)
             _buildExpandButton(
               backgroundColor,
@@ -513,6 +554,20 @@ class _BetterPlayerCupertinoControlsState
             )
           else
             const SizedBox(),
+          // add name of the video
+          Expanded(
+            child: Text(
+              _betterPlayerController!.betterPlayerDataSource!
+                      .notificationConfiguration?.title ??
+                  "",
+              style: TextStyle(
+                color: _controlsConfiguration.textColor,
+                fontSize: 12.0,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           const Spacer(),
           if (_controlsConfiguration.enableMute)
             _buildMuteButton(

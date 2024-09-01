@@ -19,8 +19,10 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
     );
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
-      Constants.hlsTestStreamUrl,
-      useAsmsSubtitles: true,
+      "http://germanyqdns4.com:8080/NXsZDaLP/471863Ey/94866",
+      liveStream: true,
+      videoExtension: "m3u8",
+      videoFormat: BetterPlayerVideoFormat.dash,
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);

@@ -36,6 +36,8 @@ class BetterPlayerControlsConfiguration {
   ///Cupertino only icon, icon of skip
   final IconData skipBackIcon;
 
+  final IconData backButton;
+
   ///Cupertino only icon, icon of forward
   final IconData skipForwardIcon;
 
@@ -161,6 +163,10 @@ class BetterPlayerControlsConfiguration {
   ///Color of text in bottom modal sheet used for overflow menu items.
   final Color overflowModalTextColor;
 
+  final bool? enableBackButton;
+
+  final Function()? onBackButton;
+
   const BetterPlayerControlsConfiguration({
     this.controlBarColor = Colors.black87,
     this.textColor = Colors.white,
@@ -213,6 +219,9 @@ class BetterPlayerControlsConfiguration {
     this.backgroundColor = Colors.black,
     this.overflowModalColor = Colors.white,
     this.overflowModalTextColor = Colors.black,
+    this.enableBackButton = true,
+    this.onBackButton,
+    this.backButton = Icons.arrow_back_ios,
   });
 
   factory BetterPlayerControlsConfiguration.white() {

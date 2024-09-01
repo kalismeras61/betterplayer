@@ -99,6 +99,7 @@ class _CustomControlsWidgetState extends State<CustomControlsWidget> {
                             else
                               widget.controller!.play();
                           });
+                          widget.onControlsVisibilityChanged!(false);
                         },
                         child: Icon(
                           widget.controller!.isPlaying()!
