@@ -234,7 +234,7 @@ class _ProgressBarPainter extends CustomPainter {
       RRect.fromRectAndRadius(
         Rect.fromPoints(
           Offset(0.0, baseOffset),
-          Offset(playedPart, baseOffset + barHeight),
+          Offset(playedPart.isNaN ? 0.0 : playedPart, baseOffset + barHeight),
         ),
         const Radius.circular(4.0),
       ),
@@ -243,12 +243,13 @@ class _ProgressBarPainter extends CustomPainter {
 
     final shadowPath = Path()
       ..addOval(Rect.fromCircle(
-          center: Offset(playedPart, baseOffset + barHeight / 2),
+          center: Offset(
+              playedPart.isNaN ? 0.0 : playedPart, baseOffset + barHeight / 2),
           radius: handleHeight));
 
     canvas.drawShadow(shadowPath, Colors.black, 0.2, false);
     canvas.drawCircle(
-      Offset(playedPart, baseOffset + barHeight / 2),
+      Offset(playedPart.isNaN ? 0.0 : playedPart, baseOffset + barHeight / 2),
       handleHeight,
       colors.handlePaint,
     );

@@ -496,6 +496,7 @@ class DurationRange {
   /// a duration of one minute, this will return `0.25` since the DurationRange
   /// starts 25% of the way through the video's total length.
   double startFraction(Duration duration) {
+    if (start.inMicroseconds == 0 || duration.inMilliseconds == 0) return 0.0;
     return start.inMilliseconds / duration.inMilliseconds;
   }
 
