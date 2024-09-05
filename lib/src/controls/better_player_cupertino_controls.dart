@@ -304,6 +304,34 @@ class _BetterPlayerCupertinoControlsState
     );
   }
 
+  GestureDetector _buildTopTitle(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double iconSize,
+    double buttonPadding,
+  ) {
+    return GestureDetector(
+      onTap: _controlsConfiguration.onBackButton,
+      child: AnimatedOpacity(
+        opacity: controlsNotVisible ? 0.0 : 1.0,
+        duration: _controlsConfiguration.controlsHideTime,
+        child: Text(
+          _betterPlayerController!
+                  .betterPlayerDataSource!.notificationConfiguration?.title ??
+              "",
+          style: TextStyle(
+            color: _controlsConfiguration.textColor,
+            fontSize: 14.0,
+            fontWeight: FontWeight.bold,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+
   Expanded _buildHitArea() {
     return Expanded(
       child: GestureDetector(
@@ -521,15 +549,18 @@ class _BetterPlayerCupertinoControlsState
       ),
       child: Row(
         children: <Widget>[
-          if (_controlsConfiguration.enableBackButton!)
+          if (_controlsConfiguration.enableBackButton!) ...[
             _buildBackButton(
               backgroundColor,
               iconColor,
               barHeight,
               iconSize,
               buttonPadding,
+            ),
+            const SizedBox(
+              width: 4,
             )
-          else
+          ] else
             const SizedBox(),
           if (_controlsConfiguration.enableFullscreen)
             _buildExpandButton(
@@ -555,18 +586,12 @@ class _BetterPlayerCupertinoControlsState
           else
             const SizedBox(),
           // add name of the video
-          Expanded(
-            child: Text(
-              _betterPlayerController!.betterPlayerDataSource!
-                      .notificationConfiguration?.title ??
-                  "",
-              style: TextStyle(
-                color: _controlsConfiguration.textColor,
-                fontSize: 12.0,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+          _buildTopTitle(
+            backgroundColor,
+            iconColor,
+            barHeight,
+            iconSize,
+            buttonPadding,
           ),
           const Spacer(),
           if (_controlsConfiguration.enableMute)
