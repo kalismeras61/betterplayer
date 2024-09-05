@@ -200,9 +200,15 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     if (headers == [NSNull null] || headers == NULL){
         headers = @{};
     }
-    
+
     AVPlayerItem* item;
-    if (useCache){
+    if ([url.absoluteString containsString:@".m3u8"]) {
+        // If it's an HLS stream, handle differently
+        AVURLAsset* asset = [AVURLAsset URLAssetWithURL:url options:@{@"AVURLAssetHTTPHeaderFieldsKey" : headers}];
+        item = [AVPlayerItem playerItemWithAsset:asset];
+        NSLog(@"HLS stream detected: %@", url.absoluteString);
+    } else if (useCache){
+        // Handle MP4 cache differently
         if (cacheKey == [NSNull null]){
             cacheKey = nil;
         }
@@ -212,8 +218,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         
         item = [cacheManager getCachingPlayerItemForNormalPlayback:url cacheKey:cacheKey videoExtension: videoExtension headers:headers];
     } else {
-        AVURLAsset* asset = [AVURLAsset URLAssetWithURL:url
-                                                options:@{@"AVURLAssetHTTPHeaderFieldsKey" : headers}];
+        AVURLAsset* asset = [AVURLAsset URLAssetWithURL:url options:@{@"AVURLAssetHTTPHeaderFieldsKey" : headers}];
         if (certificateUrl && certificateUrl != [NSNull null] && [certificateUrl length] > 0) {
             NSURL * certificateNSURL = [[NSURL alloc] initWithString: certificateUrl];
             NSURL * licenseNSURL = [[NSURL alloc] initWithString: licenseUrl];
@@ -225,11 +230,22 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         item = [AVPlayerItem playerItemWithAsset:asset];
     }
 
+    // If it's HLS, adjust the configuration
+    if ([url.absoluteString containsString:@".m3u8"]) {
+        [self configureHLSPlayerItem:item];
+    }
+
     if (@available(iOS 10.0, *) && overriddenDuration > 0) {
         _overriddenDuration = overriddenDuration;
     }
     return [self setDataSourcePlayerItem:item withKey:key];
 }
+
+- (void)configureHLSPlayerItem:(AVPlayerItem*)item {
+    item.preferredForwardBufferDuration = 10.0; // Adjust the buffer duration for HLS streams
+    // You can add more HLS-specific configurations here.
+}
+
 
 - (void)setDataSourcePlayerItem:(AVPlayerItem*)item withKey:(NSString*)key{
     _key = key;
@@ -271,33 +287,35 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     [self addObservers:item];
 }
 
--(void)handleStalled {
+- (void)handleStalled {
     if (_isStalledCheckStarted){
         return;
     }
-   _isStalledCheckStarted = true;
+    _isStalledCheckStarted = true;
+    
     [self startStalledCheck];
 }
 
--(void)startStalledCheck{
+- (void)startStalledCheck{
     if (_player.currentItem.playbackLikelyToKeepUp ||
         [self availableDuration] - CMTimeGetSeconds(_player.currentItem.currentTime) > 10.0) {
         [self play];
     } else {
         _stalledCount++;
-        if (_stalledCount > 60){
+        if (_stalledCount > 5){ // Limit the retries to 5 attempts
             if (_eventSink != nil) {
                 _eventSink([FlutterError
                         errorWithCode:@"VideoError"
                         message:@"Failed to load video: playback stalled"
                         details:nil]);
             }
+            // Optionally, provide a retry mechanism for the user
             return;
         }
         [self performSelector:@selector(startStalledCheck) withObject:nil afterDelay:1];
-
     }
 }
+
 
 - (NSTimeInterval) availableDuration
 {
@@ -439,7 +457,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         if (!_player.currentItem) {
             return;
         }
-        if (_player.status != AVPlayerStatusReadyToPlay) {
+        if (_player.currentItem.status != AVPlayerStatusReadyToPlay || _player.status != AVPlayerStatusReadyToPlay) {
             return;
         }
 

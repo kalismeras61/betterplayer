@@ -28,7 +28,7 @@ class _BasicPlayerPageState extends State<BasicPlayerPage> {
           AspectRatio(
             aspectRatio: 16 / 9,
             child: BetterPlayer.network(
-              'http://45.142.1.203:8080/live/play/YjJORVQyWjZPRTFSWXpSM1RXaFJOM1JrVjNCSFQzb3dZV2xDUXpCQ1FXRjNXRXBCTUdOaFUyZEVVVDA9/103481.mp4',
+              'http://germanyqdns4.com:8080/movie/NXsZDaLP/471863Ey/104059.mp4',
               betterPlayerConfiguration: BetterPlayerConfiguration(
                 controlsConfiguration: BetterPlayerControlsConfiguration(
                   onBackButton: () {
